@@ -46,7 +46,7 @@ o_winddirection_degree = Gauge('winddirection_degree', 'Returns mesured wind dir
 o_windspeed_kmph = Gauge('windspeed_kmph', 'Returns windspeed in kmph')
 
 if __name__ == '__main__':
-    # start prometheus server on port 
+    # start http server for prometheus on port 
     start_http_server(9200)
 
     while True:
@@ -81,6 +81,6 @@ if __name__ == '__main__':
             time.sleep(i_sleep_time)
         else:
             print(f"[{s_date_time_stamp_check}] - Request failed with status code: {o_response.status_code}")
-            # sleep for 1 minute and try again 
-            time.sleep(60)
+            # sleep for 5 minute and try again 
+            time.sleep(5 * 60)
 
