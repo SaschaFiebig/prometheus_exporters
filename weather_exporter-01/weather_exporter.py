@@ -50,19 +50,20 @@ if __name__ == '__main__':
     start_http_server(9200)
 
     while True:
-        # extract metrics
-        o_full_weather_metrics = request_weather_data('<s_your_city>')  # add your relevant city
         # date time stamp for notifications 
-        s_date_time_stamp_check = datetime.now()
-
-        if o_full_weather_metrics.status_code == 200:
+        s_date_time_stamp_check_raw = datetime.now()
+        s_date_time_stamp_check = s_date_time_stamp_check_raw.replace(microsecond=0)
+        try:
+            # extract metrics
+            o_full_weather_metrics = request_weather_data('<s_your_city>')
             # get and parse data
             d_full_weather_metrics = o_full_weather_metrics.json()
             d_metrics = extract_weather_data_from_json(d_full_weather_metrics)
-
             # print date-time-stamp from when the mesurement has been taken 
             s_date_time_stamp = d_metrics["s_date_time_stamp"]
             print(f"[{s_date_time_stamp_check}] - Last mesurement has been taken at: {s_date_time_stamp}")
+            with open("log", "a") as file:
+                file.write(f"\n[{s_date_time_stamp_check}] - Last mesurement has been taken at: {s_date_time_stamp}")
 
             # populate metric keys with weather data
             o_temperature_feels_like_c.set(d_metrics["i_temperature_feels_like_c"])
@@ -79,8 +80,10 @@ if __name__ == '__main__':
             # sleep for 1h 
             i_sleep_time = 1 * 60 * 60  # 1*60*60 == 1h
             time.sleep(i_sleep_time)
-        else:
-            print(f"[{s_date_time_stamp_check}] - Request failed with status code: {o_response.status_code}")
-            # sleep for 5 minute and try again 
-            time.sleep(5 * 60)
+        except:
+            print(f"[{s_date_time_stamp_check}] - Request failed")
+            with open("log", "a") as file:
+                file.write(f"\n[{s_date_time_stamp_check}] - Request failed")
+            # sleep for 10 minute and try again 
+            time.sleep(10 * 60)
 
